@@ -466,7 +466,7 @@ let app = new Vue({
 
     pullData(selectedData, selectedRegion, updateSelectedCountries = true) {
       //console.log('pulling', selectedData, ' for ', selectedRegion);
-      if (selectedRegion != 'US') {
+      if (selectedRegion != 'US' && selectedRegion != 'Brazil') {
         let url;
         if (selectedData == 'Confirmed Cases') {
          url = 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv';
@@ -476,10 +476,14 @@ let app = new Vue({
           return;
         }
         Plotly.d3.csv(url, (data) => this.processData(data, selectedRegion, updateSelectedCountries));
-      } else { // selectedRegion == 'US'
+      } else if (selectedRegion == 'US') { // selectedRegion == 'US'
         const type = (selectedData == 'Reported Deaths') ? 'deaths' : 'cases'
         const url = 'https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-states.csv';
         Plotly.d3.csv(url, (data) => this.processData(this.preprocessNYTData(data, type), selectedRegion, updateSelectedCountries));
+      } else if (selectedRegion == 'Brazil') {
+        const type = (selectedData == 'Reported Deaths') ? 'obitosAcumulados' : 'casosAcumulados'
+        const url = 'https://raw.githubusercontent.com/felipequintella/covid19-brazil-scraper/master/brazil.csv';
+        d3.dsv(";", url).then((data) => this.processData(this.preprocessBRData(data, type), selectedRegion, updateSelectedCountries));
       }
     },
 
@@ -589,7 +593,7 @@ let app = new Vue({
       const notableCountries = ['China', 'India', 'US', // Top 3 by population
           'South Korea', 'Japan', // Observed success so far
           'Hong Kong',            // Was previously included in China's numbers
-          'Canada', 'Australia']; // These appear in the region selector
+          'Canada', 'Australia', 'Brazil']; // These appear in the region selector
 
       // TODO: clean this logic up later
       // expected behavior: generate/overwrite selected locations if: 1. data loaded from URL, but no selected locations are loaded. 2. data refreshed (e.g. changing region)
@@ -616,6 +620,27 @@ let app = new Vue({
         return `${tmp[1]}/${tmp[2]}/${tmp[0].substr(2)}`;
       }
     },
+
+    preprocessBRData(data, type) {
+      let recastData = {};
+      data.forEach(e => {
+        let st = recastData[e.estado] = (recastData[e.estado] || {'Province/State': e.estado, 'Country/Region': 'Brazil',  'Lat': null, 'Long': null});
+        st[fixBRDate(e.data)] = parseInt(e[type]);
+      });
+      return Object.values(recastData);
+
+      function fixBRDate(date) {
+        let tmp = date.split('-');
+        return `${tmp[1]}/${tmp[2]}/${tmp[0].substr(2)}`;
+      }
+
+    },
+
+
+
+
+
+
 
     play() {
       if (this.paused) {
@@ -681,7 +706,7 @@ let app = new Vue({
     },
 
     createURL() {
-      let baseUrl = 'https://aatishb.com/covidtrends/?';
+      let baseUrl = 'https://covid19.felipequintella.com/?';
 
       let queryUrl = new URLSearchParams();
 
@@ -775,6 +800,8 @@ let app = new Vue({
           return 'Provinces';
         case 'Canada':
           return 'Provinces';
+        case 'Brazil':
+          return 'States';
         default:
           return 'Regions';
       }
@@ -789,7 +816,7 @@ let app = new Vue({
 
     selectedData: 'Confirmed Cases',
 
-    regions: ['World', 'US', 'China', 'Australia', 'Canada'],
+    regions: ['World', 'US', 'China', 'Australia', 'Canada', 'Brazil'],
 
     selectedRegion: 'World',
 
