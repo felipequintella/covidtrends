@@ -818,7 +818,7 @@ let app = new Vue({
 
     regions: ['World', 'US', 'China', 'Australia', 'Canada', 'Brazil'],
 
-    selectedRegion: 'World',
+    selectedRegion: 'Brazil',
 
     sliderSelected: false,
 
