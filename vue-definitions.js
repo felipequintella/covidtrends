@@ -631,7 +631,7 @@ let app = new Vue({
 
       function fixBRDate(date) {
         let tmp = date.split('/');
-        return `${tmp[1]}/${tmp[0]}/${tmp[3].substr(2)}`;
+        return `${tmp[1]}/${tmp[0]}/${tmp[2].substr(2)}`;
       }
 
     },
