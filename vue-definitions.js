@@ -630,8 +630,8 @@ let app = new Vue({
       return Object.values(recastData);
 
       function fixBRDate(date) {
-        let tmp = date.split('-');
-        return `${tmp[1]}/${tmp[2]}/${tmp[0].substr(2)}`;
+        let tmp = date.split('/');
+        return `${tmp[1]}/${tmp[0]}/${tmp[3].substr(2)}`;
       }
 
     },
