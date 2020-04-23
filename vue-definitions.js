@@ -94,7 +94,7 @@ Vue.component('graph', {
           color: 'rgba(0,0,0,0.15)'
         },
         hoverinfo:'x+y+text',
-        hovertemplate: '%{text}<br>Total ' + this.selectedData +': %{x:,}<br>Weekly ' + this.selectedData +': %{y:,}<extra></extra>',
+        hovertemplate: '%{text}<br>Total ' + this.selectedData +': %{x:,}<br>New ' + this.selectedData +': %{y:,}<extra></extra>',
       })
       );
 
@@ -110,7 +110,7 @@ Vue.component('graph', {
           size: 6,
           color: 'rgba(254, 52, 110, 1)'
         },
-        hovertemplate: '%{data.text}<br>Total ' + this.selectedData +': %{x:,}<br>Weekly ' + this.selectedData +': %{y:,}<extra></extra>',
+        hovertemplate: '%{data.text}<br>Total ' + this.selectedData +': %{x:,}<br>New ' + this.selectedData +': %{y:,}<extra></extra>',
 
       })
       );
@@ -126,6 +126,12 @@ Vue.component('graph', {
     updateLayout() {
 
       //console.log('layout updated');
+      let accumulationPeriodString = '';
+      if (this.selectedRegion == 'Brazil') {
+        accumulationPeriodString = ' (in the Past 2 Weeks)';
+      } else {
+        accumulationPeriodString = ' (in the Past Week)';
+      }
 
       if (this.autosetRange) {
         this.setxrange();
@@ -147,7 +153,7 @@ Vue.component('graph', {
           },
         },
         yaxis: {
-          title: 'New ' + this.selectedData + ' (in the Past Week)',
+          title: 'New ' + this.selectedData + accumulationPeriodString,
           type: this.scale == 'Logarithmic Scale' ? 'log' : 'linear',
           range: this.yrange,
           titlefont: {
@@ -569,6 +575,10 @@ let app = new Vue({
             arr.push(row[date]);
           }
           let slope = arr.map((e,i,a) => e - a[i - 7]);
+          if (selectedRegion == 'Brazil') {
+            slope = arr.map((e,i,a) => e - a[i - 14]);
+          }
+
           let region = row.region
 
           if (Object.keys(renames).includes(region)) {
