@@ -633,15 +633,27 @@ let app = new Vue({
 
     preprocessBRData(data, type) {
       let recastData = {};
-      data.forEach(e => {
+      for (let i = 0; i < data.length; i++) {
+        let e = data[i];
+        if (e.regiao === "") 
+          break;
         let st = recastData[e.estado] = (recastData[e.estado] || {'Province/State': e.estado, 'Country/Region': 'Brazil',  'Lat': null, 'Long': null});
         st[fixBRDate(e.data)] = parseInt(e[type]);
-      });
+      }
+//      data.forEach(e => {
+//          let st = recastData[e.estado] = (recastData[e.estado] || {'Province/State': e.estado, 'Country/Region': 'Brazil',  'Lat': null, 'Long': null});
+//          st[fixBRDate(e.data)] = parseInt(e[type]);
+//      });
       return Object.values(recastData);
 
       function fixBRDate(date) {
-        let tmp = date.split('-');
-        return `${tmp[1]}/${tmp[2]}/${tmp[0].substr(2)}`;
+        if (date.includes('-') === true) {
+          let tmp = date.split('-');
+          return `${tmp[1]}/${tmp[2]}/${tmp[0].substr(2)}`;
+        } else if (date.includes('/') === true) {
+          let tmp = date.split('/');
+          return `${tmp[0]}/${tmp[1]}/${tmp[2].substr(2)}`;
+        }
       }
 
     },
