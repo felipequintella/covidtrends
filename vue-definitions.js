@@ -454,7 +454,7 @@ let app = new Vue({
       const notableCountries = ['China (Mainland)', 'India', 'US', // Top 3 by population
           'South Korea', 'Japan', 'Taiwan', 'Singapore', // Observed success so far
           'Hong Kong',            // Was previously included in China's numbers
-          'Canada', 'Australia']; // These appear in the region selector
+          'Canada', 'Australia', 'Brazil']; // These appear in the region selector
 
       // TODO: clean this logic up later
       // expected behavior: generate/overwrite selected locations if: 1. data loaded from URL, but no selected locations are loaded. 2. data refreshed (e.g. changing region)
