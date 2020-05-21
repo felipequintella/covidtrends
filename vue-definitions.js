@@ -341,9 +341,11 @@ let app = new Vue({
         const url = 'https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-states.csv';
         Plotly.d3.csv(url, (data) => this.processData(this.preprocessNYTData(data, type), selectedRegion, updateSelectedCountries));
       } else if (selectedRegion == 'Brazil') {
-        const type = (selectedData == 'Reported Deaths') ? 'obitosAcumulados' : 'casosAcumulados'
+        const type = (selectedData == 'Reported Deaths') ? 'obitosAcumulado' : 'casosAcumulado'
         const url = 'https://raw.githubusercontent.com/felipequintella/covid19-brazil-scraper/master/brazil.csv';
-        d3.dsv(";", url).then((data) => this.processData(this.preprocessBRData(data, type), selectedRegion, updateSelectedCountries));
+        Plotly.d3.csv(url, (data) => this.processData(this.preprocessBRData(data, type), selectedRegion, updateSelectedCountries));
+        //d3.dsv(";", url).then((data) => this.processData(this.preprocessBRData(data, type), selectedRegion, updateSelectedCountries));
+        
       }
     },
 
@@ -482,17 +484,14 @@ let app = new Vue({
 
     preprocessBRData(data, type) {
       let recastData = {};
-      for (let i = 0; i < data.length; i++) {
-        let e = data[i];
-        if (e.regiao === "") 
-          break;
-        let st = recastData[e.estado] = (recastData[e.estado] || {'Province/State': e.estado, 'Country/Region': 'Brazil',  'Lat': null, 'Long': null});
-        st[fixBRDate(e.data)] = parseInt(e[type]);
-      }
-//      data.forEach(e => {
-//          let st = recastData[e.estado] = (recastData[e.estado] || {'Province/State': e.estado, 'Country/Region': 'Brazil',  'Lat': null, 'Long': null});
-//          st[fixBRDate(e.data)] = parseInt(e[type]);
-//      });
+
+      data.forEach(e => {
+         if (e.estado != "" && e.codmun === "") {
+             let st = recastData[e.estado] = (recastData[e.estado] || {'Province/State': e.estado, 'Country/Region': 'Brazil',  'Lat': null, 'Long': null});
+             st[fixBRDate(e.data)] = parseInt(e[type]);
+          }
+      });
+
       return Object.values(recastData);
 
       function fixBRDate(date) {
